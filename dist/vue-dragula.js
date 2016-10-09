@@ -1387,7 +1387,11 @@ var require$$0$3 = Object.freeze({
 	    params: ['bag'],
 
 	    bind: function bind(container, binding, vnode) {
-	      var bagName = vnode.data.attrs.bag;
+	      var bagName = vnode ? vnode.data.attrs.bag // Vue 2
+	      : this.params.bag; // Vue 1
+	      if (!vnode) {
+	        container = this.el; // Vue 1
+	      }
 	      if (bagName !== undefined && bagName.length !== 0) {
 	        name = bagName;
 	      }
@@ -1405,13 +1409,14 @@ var require$$0$3 = Object.freeze({
 	      service.handleModels(name, drake);
 	    },
 	    update: function update(container, binding, vnode, oldVnode) {
-	      var newValue = binding.value;
-
+	      var newValue = vnode ? binding.value // Vue 2
+	      : container; // Vue 1
 	      if (!newValue) {
 	        return;
 	      }
 
-	      var bagName = vnode.data.attrs.bag;
+	      var bagName = vnode ? vnode.data.attrs.bag // Vue 2
+	      : this.params.bag; // Vue 1
 	      if (bagName !== undefined && bagName.length !== 0) {
 	        name = bagName;
 	      }
@@ -1421,20 +1426,24 @@ var require$$0$3 = Object.freeze({
 	        drake.models = [];
 	      }
 
-	      var modelContainer = service.findModelContainerByContainer(vnode.elm, drake);
+	      if (!vnode) {
+	        container = this.el; // Vue 1
+	      }
+	      var modelContainer = service.findModelContainerByContainer(container, drake);
 
 	      if (modelContainer) {
 	        modelContainer.model = newValue;
 	      } else {
 	        drake.models.push({
 	          model: newValue,
-	          container: vnode.elm
+	          container: container
 	        });
 	      }
 	    },
 	    unbind: function unbind(container, binding, vnode) {
 	      var unbindBagName = 'globalBag';
-	      var bagName = vnode.data.attrs.bag;
+	      var bagName = vnode ? vnode.data.attrs.bag // Vue 2
+	      : this.params.bag; // Vue 1
 	      if (bagName !== undefined && bagName.length !== 0) {
 	        unbindBagName = bagName;
 	      }
